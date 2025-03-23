@@ -1,7 +1,6 @@
-[hestiacp]
-name=msvsphere9 repo on repo.brepo.ru
-comment=msvsphere9 repo on repo.brepo.ru
-baseurl=https://repo.brepo.ru/repo/msvsphere9_preprod
+[hectiacp]
+name=msvsphere9 hestia repo on repo.brepo.ru
+baseurl=https://repo.brepo.ru/hestia/
 enabled=1
-gpgkey=https://repo.brepo.ru/repo/gpgkeys/repo.brepo.ru.pub
+gpgkey=https://repo.brepo.ru/hestia/brepo_projects-gpg-key
 gpgcheck=1

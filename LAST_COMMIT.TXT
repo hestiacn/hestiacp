@@ -1,5 +1,7 @@
-commit e991cf47974bf02f6d9301476b24f53c1954452b (HEAD -> master, tag: 1.9.5.rpm, origin/master, origin/devel, origin/HEAD, devel)
-Author: a@bayrepo.ru
-Date:   Tue Feb 4 23:41:46 2025 +0300
+commit 2b1157b0aa4b4d24f7b331f6a2dd29705e188cf7 (HEAD -> devel, origin/master, origin/devel, origin/HEAD, master)
+Author: <a@bayrepo.ru>
+Date:   Sun Mar 23 23:37:17 2025 +0300
 
-    Fixed changelog
+    Fixed new repo path
+
+

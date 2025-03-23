@@ -763,7 +763,7 @@ fi
 # Installing HestiaCP repo
 echo "[ * ] Hestia Control Panel"
 dnf config-manager --add-repo https://dev.brepo.ru/bayrepo/hestiacp/raw/branch/master/install/rpm/hestia/hestia.repo
-rpm --import https://repo.brepo.ru/repo/gpgkeys/repo.brepo.ru.pub
+rpm --import https://repo.brepo.ru/hestia/brepo_projects-gpg-key
 check_result $? "rpm import brepo.ru GPG key failed"
 mkdir /var/cache/hestia-nginx/
 
